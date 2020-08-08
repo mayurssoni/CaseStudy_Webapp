@@ -1,0 +1,11 @@
+---
+- name: Create a container
+  docker_container:
+    name: casestudy-spring
+    image: "{{ docker_image }}"
+    ports:
+    - "80:8080"
+  when:
+    - ansible_connection != "docker"
+
+- debug: msg="http://{{ inventory_hostname }}:80 is URL for your application."

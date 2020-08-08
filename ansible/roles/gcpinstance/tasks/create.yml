@@ -1,0 +1,88 @@
+---
+- name: create a disk
+  gcp_compute_disk:
+    name: "{{ hostname }}-disk"
+    size_gb: 50
+    source_image: 'projects/centos-cloud/global/images/centos-7-v20200714'
+    zone: "{{ zone }}"
+    project: "{{ project_id }}"
+    auth_kind: "{{ auth_kind }}"
+    service_account_file: "{{ credentials_file }}"
+    scopes:
+      - https://www.googleapis.com/auth/compute
+    state: present
+  register: disk
+
+- name: create a network
+  gcp_compute_network:
+    name: "{{ hostname }}-net"
+    project: "{{ project_id }}"
+    auth_kind: "{{ auth_kind }}"
+    service_account_file: "{{ credentials_file }}"
+    scopes:
+      - https://www.googleapis.com/auth/compute
+    state: present
+  register: network
+
+- name: create a address
+  gcp_compute_address:
+    name: "{{ hostname }}-address"
+    region: "{{ region }}"
+    project: "{{ project_id }}"
+    auth_kind: "{{ auth_kind }}"
+    service_account_file: "{{ credentials_file }}"
+    scopes:
+      - https://www.googleapis.com/auth/compute
+    state: present
+  register: address
+
+- name: create a firewall
+  gcp_compute_firewall:
+    name: "{{ hostname }}-firewall"
+    network: "{{ network }}"
+    allowed:
+    - ip_protocol: tcp
+      ports: ['8080','22','80']
+    target_tags:
+    - docker-server
+    - http-server
+    source_ranges: ['0.0.0.0/0']
+    project: "{{ project_id }}"
+    auth_kind: "{{ auth_kind }}"
+    service_account_file: "{{ credentials_file }}"
+    state: present
+  register: firewall
+
+
+- name: create a instance
+  gcp_compute_instance:
+    state: present
+    name: "{{ hostname }}-vm"
+    machine_type: n1-standard-1
+    disks:
+      - auto_delete: true
+        boot: true
+        source: "{{ disk }}"
+    network_interfaces:
+        - network: "{{ network }}"
+          access_configs:
+            - name: 'External NAT'
+              nat_ip: "{{ address }}"
+              type: 'ONE_TO_ONE_NAT'
+    zone: "{{ zone }}"
+    project: "{{ project_id }}"
+    auth_kind: "{{ auth_kind }}"
+    service_account_file: "{{ credentials_file }}"
+    tags:
+      items:
+      - docker-server
+      - http-server
+    scopes:
+      - https://www.googleapis.com/auth/compute
+  register: instance
+
+- name: Wait for SSH to come up
+  wait_for: host={{ address.address }} port=22 delay=10 timeout=100
+
+- name: Add host to groupname
+  add_host: hostname={{ address.address }} groupname=new_instances

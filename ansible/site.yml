@@ -1,0 +1,10 @@
+---
+- import_playbook: playbooks/10_gcp_instance.yml
+
+- import_playbook: playbooks/20_docker_install.yml
+  tags:
+  - create
+
+- import_playbook: playbooks/30_docker_run.yml
+  tags:
+  - create

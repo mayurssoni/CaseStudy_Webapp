@@ -1,0 +1,126 @@
+---
+# vars file for docker
+
+core_dependencies_shared_packages:
+  - acl
+  - at
+  - bzip2
+  - bash
+  - git
+  - gzip
+  - tar
+  - unzip
+
+_core_dependencies_packages:
+  Alpine:
+    - iproute2
+    - shadow
+    - subversion
+    - xz
+  Amazon-2018:
+    - iproute
+    - python-pip
+    - python-setuptools
+    - shadow-utils
+    - xz
+  Amazon-2:
+    - iproute
+    - python3-pip
+    - python3-setuptools
+    - shadow-utils
+    - xz
+  Debian:
+    - debconf
+    - debconf-utils
+    - iproute2
+    - passwd
+    - python3-apt
+    - subversion
+    - xz-utils
+  RedHat-7:
+    - iproute
+    - libselinux-python
+    - libsemanage-python
+    - shadow-utils
+    - xz
+    - yum
+  RedHat:
+    - dnf
+    - iproute
+    - python3-dnf
+    - python3-libselinux
+    - python3-libsemanage
+    - python3-pip
+    - python3-setuptools
+    - python3-virtualenv
+    - shadow-utils
+    - xz
+  Suse:
+    - iproute2
+    - libselinux1
+    - python-pip
+    - python-selinux
+    - python-setuptools
+    - shadow
+    - subversion
+    - xz
+
+core_dependencies_packages: "{{ _core_dependencies_packages[ansible_distribution ~ '-' ~ ansible_distribution_major_version ] | default(_core_dependencies_packages[ansible_os_family ~ '-' ~ ansible_distribution_major_version] | default(_core_dependencies_packages[ansible_os_family] | default(_core_dependencies_packages['default']))) }}"
+
+core_dependencies_pip_packages:
+  - boto
+  - boto3
+  - boto
+
+_python_pip_packages:
+  Alpine:
+    - py3-pip
+    - py3-setuptools
+    - python3-dev
+  Debian:
+    - python3-pip
+    - python3-setuptools
+  RedHat-7:
+    - python2-pip
+    - python-setuptools
+  RedHat:
+    - python3-pip
+    - python3-setuptools
+  Suse:
+    - python-pip
+    - python-setuptools
+
+python_pip_packages: "{{ _python_pip_packages[ansible_os_family ~ '-' ~ ansible_distribution_major_version] | default(_python_pip_packages[ansible_os_family] | default(_python_pip_packages['default'])) }}"
+
+_docker_packages:
+  default:
+    - docker
+    - docker-compose
+  Alpine:
+    - docker
+  RedHat-7:
+    - docker-io
+    - docker-compose
+  RedHat-8:
+    - podman-docker
+  Debian:
+    - docker.io
+    - docker-compose
+
+docker_packages: "{{ _docker_packages[ansible_os_family ~ '-' ~ ansible_distribution_major_version] | default(_docker_packages[ansible_os_family] | default(_docker_packages['default'])) }}"
+
+docker_pip_packages:
+  - docker
+  - docker-compose
+
+_docker_service:
+  default: docker
+  RedHat-8: io.podman
+
+docker_service: "{{ _docker_service[ansible_os_family ~ '-' ~ ansible_distribution_major_version] | default(_docker_service['default']) }}"
+
+_docker_socket:
+  default: /var/run/docker.sock
+  RedHat-8: /var/run/podman/io.podman
+
+docker_socket: "{{ _docker_socket[ansible_os_family ~ '-' ~ ansible_distribution_major_version] | default(_docker_socket['default']) }}"

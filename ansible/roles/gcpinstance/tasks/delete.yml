@@ -1,0 +1,42 @@
+---
+- name: delete an instance
+  gcp_compute_instance:
+    name: "{{ hostname }}-vm"
+    zone: "{{ zone }}"
+    project: "{{ project_id }}"
+    auth_kind: "{{ auth_kind }}"
+    service_account_file: "{{ credentials_file }}"
+    state: absent
+
+- name: delete an address
+  gcp_compute_address:
+    name: "{{ hostname }}-address"
+    region: "{{ region }}"
+    project: "{{ project_id }}"
+    auth_kind: "{{ auth_kind }}"
+    service_account_file: "{{ credentials_file }}"
+    state: absent
+
+- name: delete a firewall
+  gcp_compute_firewall:
+    name: "{{ hostname }}-firewall"
+    project: "{{ project_id }}"
+    auth_kind: "{{ auth_kind }}"
+    service_account_file: "{{ credentials_file }}"
+    state: absent
+
+- name: register the existing network
+  gcp_compute_network:
+    name: "{{ hostname }}-net"
+    project: "{{ project_id }}"
+    auth_kind: "{{ auth_kind }}"
+    service_account_file: "{{ credentials_file }}"
+  register: network
+
+- name: delete a network
+  gcp_compute_network:
+    name: "{{ hostname }}-net"
+    project: "{{ project_id }}"
+    auth_kind: "{{ auth_kind }}"
+    service_account_file: "{{ credentials_file }}"
+    state: absent

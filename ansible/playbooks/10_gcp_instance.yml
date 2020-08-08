@@ -1,0 +1,8 @@
+---
+- name: Create GCP instance resources
+  hosts: localhost
+  gather_facts: no
+  connection: local
+
+  roles:
+    - { role: gcpinstance, hostname: "{{ instance }}" }

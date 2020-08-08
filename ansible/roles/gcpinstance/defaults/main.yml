@@ -1,0 +1,6 @@
+ansible_ssh_private_key_file: "~/.ssh/ansible"
+region: "us-central1"
+zone: "us-central1-c"
+credentials_file: "~/devops-bootcamp-b05-4bf17b510882.json"
+project_id: "devops-bootcamp-b05"
+auth_kind: "serviceaccount"

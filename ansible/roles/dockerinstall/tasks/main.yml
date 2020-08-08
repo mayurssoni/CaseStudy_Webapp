@@ -1,0 +1,48 @@
+---
+# tasks file for docker
+
+- name: install packages
+  package:
+    name: "{{ core_dependencies_shared_packages + core_dependencies_packages }}"
+    state: present
+
+- name: try to install pip packages
+  pip:
+    name: "{{ core_dependencies_pip_packages }}"
+    state: present
+  failed_when: no
+
+- name: install python pip
+  package:
+    name: "{{ python_pip_packages }}"
+    state: present
+
+- name: update pip
+  pip:
+    name: pip
+    state: latest 
+
+- name: install docker
+  package:
+    name: "{{ docker_packages }}"
+    state: present
+
+- name: install docker pip packages
+  pip:
+    name: "{{ docker_pip_packages }}"
+    state: present
+
+- name: add docker group
+  group:
+    name: docker
+    system: yes
+
+- name: start and enable docker
+  service:
+    name: "{{ docker_service }}"
+    state: started
+    enabled: yes
+  notify:
+    - change group for docker socket
+  when:
+    - ansible_connection != "docker"
