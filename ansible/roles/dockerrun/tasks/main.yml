@@ -8,4 +8,4 @@
   when:
     - ansible_connection != "docker"
 
-- debug: msg="http://{{ inventory_hostname }}:80 is URL for your application."
+- debug: msg="http://{{ inventory_hostname }}:80/Casestudy_War is URL for your application."
